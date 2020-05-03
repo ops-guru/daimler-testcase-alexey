@@ -1,0 +1,247 @@
+---
+swagger: "2.0"
+info:
+  description: "- Implement the specified REST Endpoint\n- Protect the API with BasicAuth\n\
+    - Use Docker to run your application\n- Use one of the following languages&#58;\
+    \ Go, Java, Python, C++\n- Automate the infrastructure rollout\n- Use an external\
+    \ service to determine the city name for depature and destination\n- Upload your\
+    \ solution to a private GitHub repository\n- Provide a link to the secured hosted\
+    \ instance of your solution\n- Provide the following files together with your\
+    \ code&#58;\n  * Dockerfile\n  * Build-Script\n  * Deployment-Script\n  * Kubernetes\
+    \ deployment YAML (if Kubernetes is used)\n  * Infrastructure automation scripts\n\
+    \  * README.md with documentation how to deploy the infrastructure and the application\n"
+  version: "1.0.0"
+  title: "Mercedes-Benz AG Programming Challenge"
+basePath: "/v1"
+tags:
+  - name: "Vehicle Trip Analyzer"
+paths:
+  /trip:
+    post:
+      tags:
+        - "Vehicle Trip Analyzer"
+      summary: "analyze a vehicle trip"
+      description: "this endpoints gets a list of data points from a vehicle. the\
+        \ whole list represents a trip from one location to another with several stops\
+        \ to refuel or just to eat some cookies."
+      operationId: "analyze"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "vehicle data that needs to be analyzed"
+          required: true
+          schema:
+            $ref: "#/definitions/VehiclePush"
+      responses:
+        "200":
+          description: "returns analyzed vehicle data"
+          schema:
+            $ref: "#/definitions/VehiclePushAnalysis"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "405":
+          description: "Invalid input"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: "swagger_server.controllers.vehicle_trip_analyzer_controller"
+securityDefinitions:
+  BasicAuth:
+    type: "basic"
+    x-basicInfoFunc: swagger_server.util.basic_auth
+definitions:
+  VehiclePush:
+    type: "object"
+    properties:
+      vin:
+        type: "string"
+        example: "WDD1671591Z000999"
+        description: "vehicle identification number"
+      breakThreshold:
+        type: "integer"
+        format: "int32"
+        example: 1800
+        description: "threshold to calculate if a car just stopped or did a break"
+      gasTankSize:
+        type: "integer"
+        format: "int32"
+        example: 80
+        description: "the size of the gas tank in liter"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/VehiclePushDataPoint"
+    example:
+      gasTankSize: 80
+      data:
+        - positionLong: 9.172787
+          fuelLevel: 52
+          odometer: 7200
+          positionLat: 48.77199
+          timestamp: 1559137020
+        - positionLong: 11.582
+          fuelLevel: 44
+          odometer: 7221
+          positionLat: 48.1351
+          timestamp: 1559137021
+        - positionLong: 11.582
+          fuelLevel: 44
+          odometer: 7221
+          positionLat: 48.1351
+          timestamp: 1559137022
+        - positionLong: 11.582
+          fuelLevel: 37
+          odometer: 7238
+          positionLat: 48.1351
+          timestamp: 1559137023
+        - positionLong: 11.582
+          fuelLevel: 22
+          odometer: 7300
+          positionLat: 48.1351
+          timestamp: 1559137024
+        - positionLong: 11.582
+          fuelLevel: 80
+          odometer: 7300
+          positionLat: 48.1351
+          timestamp: 1559137025
+        - positionLong: 11.582
+          fuelLevel: 80
+          odometer: 7300
+          positionLat: 48.1351
+          timestamp: 1559137026
+        - positionLong: 11.582
+          fuelLevel: 95
+          odometer: 7300
+          positionLat: 48.1351
+          timestamp: 1559137027
+        - positionLong: 11.582
+          fuelLevel: 80
+          odometer: 7310
+          positionLat: 48.1351
+          timestamp: 1559137028
+        - positionLong: 11.582
+          fuelLevel: 80
+          odometer: 7310
+          positionLat: 48.1351
+          timestamp: 1559137029
+        - positionLong: 11.582
+          fuelLevel: 10
+          odometer: 7500
+          positionLat: 48.1351
+          timestamp: 1559137030
+      breakThreshold: 1800
+      vin: "WDD1671591Z000999"
+  VehiclePushDataPoint:
+    type: "object"
+    properties:
+      timestamp:
+        type: "integer"
+        format: "int64"
+        example: 1559137020
+        description: "unix timestamp"
+      odometer:
+        type: "integer"
+        format: "int32"
+        example: 7200
+        description: "odometer value for a given time"
+      fuelLevel:
+        type: "integer"
+        format: "int32"
+        example: 52
+        description: "fuel level for a given time in percent"
+        minimum: 0
+        maximum: 100
+      positionLat:
+        type: "number"
+        format: "float"
+        example: 48.77199
+        description: "latitude position for a given time"
+      positionLong:
+        type: "number"
+        format: "float"
+        example: 9.172787
+        description: "longitude position for a given time"
+    example:
+      positionLong: 9.172787
+      fuelLevel: 52
+      odometer: 7200
+      positionLat: 48.77199
+      timestamp: 1559137020
+  VehiclePushAnalysis:
+    type: "object"
+    properties:
+      vin:
+        type: "string"
+        example: "WDD1671591Z000999"
+        description: "vehicle identification number"
+      departure:
+        type: "string"
+        example: "Stuttgart"
+        description: "city/location where the trip started"
+      destination:
+        type: "string"
+        example: "München"
+        description: "city/location where the trip ended"
+      refuelStops:
+        type: "array"
+        description: "a list of all refuel stops during the trip"
+        items:
+          $ref: "#/definitions/Break"
+      consumption:
+        type: "number"
+        format: "float"
+        example: 5.5
+        description: "the average consumption during the trip (l/100km)"
+      breaks:
+        type: "array"
+        description: "a list of all breaks during the trip including the refuel stops"
+        items:
+          $ref: "#/definitions/Break"
+    example:
+      breaks:
+        - positionLong: 5.962134
+          positionLat: 1.4658129
+          endTimestamp: 6
+          startTimestamp: 0
+        - positionLong: 5.962134
+          positionLat: 1.4658129
+          endTimestamp: 6
+          startTimestamp: 0
+      destination: "München"
+      vin: "WDD1671591Z000999"
+      consumption: 5.5
+      departure: "Stuttgart"
+      refuelStops:
+        - positionLong: 5.962134
+          positionLat: 1.4658129
+          endTimestamp: 6
+          startTimestamp: 0
+        - positionLong: 5.962134
+          positionLat: 1.4658129
+          endTimestamp: 6
+          startTimestamp: 0
+  Break:
+    type: "object"
+    properties:
+      startTimestamp:
+        type: "integer"
+        format: "int64"
+      endTimestamp:
+        type: "integer"
+        format: "int64"
+      positionLat:
+        type: "number"
+        format: "float"
+      positionLong:
+        type: "number"
+        format: "float"
+    example:
+      positionLong: 5.962134
+      positionLat: 1.4658129
+      endTimestamp: 6
+      startTimestamp: 0

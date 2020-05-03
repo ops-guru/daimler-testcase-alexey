@@ -1,0 +1,74 @@
+py/.travis.yaml
+py/.swagger-codegen-ignore
+py/README.md
+py/tox.ini
+py/git_push.sh
+py/requirements.dev.txt
+py/requirements.test.txt
+py/setup.py
+py/.pylintrc
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+py/.Python
+py/env/
+py/build/
+py/develop-eggs/
+py/dist/
+py/downloads/
+py/eggs/
+py/.eggs/
+py/lib/
+py/lib64/
+py/parts/
+py/sdist/
+py/var/
+py/*.egg-info/
+py/.installed.cfg
+py/*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+py/pip-log.txt
+py/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+py/htmlcov/
+py/.tox/
+py/.coverage
+py/.coverage.*
+py/.cache
+py/nosetests.xml
+py/coverage.xml
+py/*,cover
+py/.hypothesis/
+py/venv/
+py/.python-version
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+py/docs/_build/
+
+# PyBuilder
+py/target/
+
+#Ipython Notebook
+py/.ipynb_checkpoints
